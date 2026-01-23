@@ -1,48 +1,70 @@
 import { createServer } from "node:http";
-import { join } from "node:path";
 import { hostname } from "node:os";
 import wisp from "wisp-server-node";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
+import fastifyCompress from "@fastify/compress";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-// UV and proxy dependencies
 import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
 
-// Resolve directory paths for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '..', 'public');
 
-// Environment variables with fallbacks
-// Note: Using 0.0.0.0 instead of localhost makes it accessible on LAN
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || '0.0.0.0';
 const NODE_ENV = process.env.NODE_ENV || 'production';
 
-// Create Fastify instance with custom server factory
-// This is needed to handle both HTTP requests and WebSocket upgrades
+const activeConnections = new Set();
+
 const fastify = Fastify({
 	serverFactory: (handler) => {
 		return createServer()
 			.on("request", (req, res) => {
-				// These headers enable SharedArrayBuffer and cross-origin isolation
-				// Required for some web APIs to work properly through the proxy
 				res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
 				res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+				res.setHeader("Connection", "keep-alive");
+				res.setHeader("Keep-Alive", "timeout=30, max=1000");
 				handler(req, res);
 			})
 			.on("upgrade", (req, socket, head) => {
-				// Handle WebSocket upgrades for WISP protocol
-				// FIXME: Sometimes connections drop after ~30 seconds - investigate
-				if (req.url.endsWith("/wisp/")) wisp.routeRequest(req, socket, head);
-				else socket.end();
+				if (req.url.endsWith("/wisp/")) {
+					activeConnections.add(socket);
+					socket.setKeepAlive(true, 30000);
+					socket.setTimeout(0);
+					
+					socket.on('close', () => {
+						activeConnections.delete(socket);
+					});
+					
+					socket.on('error', (err) => {
+						activeConnections.delete(socket);
+						if (err.code !== 'ECONNRESET') {
+							console.error('WebSocket error:', err.code);
+						}
+					});
+					
+					wisp.routeRequest(req, socket, head);
+				} else {
+					socket.end();
+				}
 			});
 	},
-	// Only enable logging in development mode to keep production logs clean
-	logger: NODE_ENV === 'development'
+	logger: NODE_ENV === 'development',
+	bodyLimit: 10 * 1024 * 1024,
+	requestTimeout: 30000,
+	keepAliveTimeout: 30000,
+	connectionTimeout: 30000
+});
+
+fastify.register(fastifyCompress, {
+	global: true,
+	threshold: 1024,
+	encodings: ['gzip', 'deflate', 'br'],
+	customTypes: /^(?!image\/|video\/|audio\/|application\/octet-stream)/
 });
 
 fastify.register(fastifyStatic, {
@@ -50,94 +72,148 @@ fastify.register(fastifyStatic, {
 	prefix: "/",
 	decorateReply: true,
 	cacheControl: true,
-	maxAge: NODE_ENV === 'development' ? 0 : 3600000,
-	immutable: false,
+	maxAge: NODE_ENV === 'development' ? 0 : 86400000,
+	immutable: NODE_ENV !== 'development',
 	etag: true,
 	lastModified: true,
+	preCompressed: true
 });
 
-// Main route - serves our browser interface
 fastify.get("/", (req, reply) => {
 	return reply.sendFile("index.html", publicDir);
 });
+
+const faviconCache = new Map();
+const FAVICON_CACHE_TTL = 3600000;
 
 fastify.get("/favicon-proxy", async (req, reply) => {
 	try {
 		const { url } = req.query;
 		
 		if (!url) {
-			return reply.code(400).send({ error: 'URL parameter is required' });
+			return reply.code(400).send({ error: 'URL parameter required' });
 		}
 		
-		const validServices = [
-			'www.google.com/s2/favicons',
-			'icons.duckduckgo.com/ip3',
-			'favicons.githubusercontent.com'
-		];
+		const cached = faviconCache.get(url);
+		if (cached && Date.now() - cached.timestamp < FAVICON_CACHE_TTL) {
+			reply.header('Content-Type', cached.contentType);
+			reply.header('Cache-Control', 'public, max-age=86400');
+			reply.header('Access-Control-Allow-Origin', '*');
+			reply.header('X-Cache', 'HIT');
+			return reply.send(cached.buffer);
+		}
 		
 		const urlObj = new URL(url);
-		const isValidService = validServices.some(service => 
-			urlObj.hostname + urlObj.pathname.split('/')[1] === service.split('/')[0] ||
-			urlObj.href.includes(service)
-		);
+		const validServices = [
+			'www.google.com',
+			'icons.duckduckgo.com',
+			'favicons.githubusercontent.com',
+			't0.gstatic.com',
+			't1.gstatic.com',
+			't2.gstatic.com',
+			't3.gstatic.com'
+		];
 		
-		if (!isValidService) {
+		if (!validServices.includes(urlObj.hostname)) {
 			return reply.code(403).send({ error: 'Invalid favicon service' });
 		}
 		
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 3000);
+		
 		const response = await fetch(url, {
 			headers: {
-				'User-Agent': 'Glint-Browser/1.0',
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
 				'Accept': 'image/*,*/*;q=0.8'
 			},
-			timeout: 5000
+			signal: controller.signal
 		});
+		
+		clearTimeout(timeoutId);
 		
 		if (!response.ok) {
 			return reply.code(response.status).send({ error: 'Failed to fetch favicon' });
 		}
 		
 		const contentType = response.headers.get('content-type') || 'image/x-icon';
-		const imageBuffer = await response.arrayBuffer();
+		const buffer = Buffer.from(await response.arrayBuffer());
+		
+		if (buffer.length < 50000) {
+			faviconCache.set(url, {
+				buffer,
+				contentType,
+				timestamp: Date.now()
+			});
+			
+			if (faviconCache.size > 500) {
+				const now = Date.now();
+				for (const [key, value] of faviconCache) {
+					if (now - value.timestamp > FAVICON_CACHE_TTL) {
+						faviconCache.delete(key);
+					}
+				}
+			}
+		}
 		
 		reply.header('Content-Type', contentType);
 		reply.header('Cache-Control', 'public, max-age=86400');
 		reply.header('Access-Control-Allow-Origin', '*');
+		reply.header('X-Cache', 'MISS');
 		
-		return reply.send(Buffer.from(imageBuffer));
+		return reply.send(buffer);
 		
 	} catch (error) {
-		console.error('Favicon proxy error:', error);
+		if (error.name === 'AbortError') {
+			return reply.code(504).send({ error: 'Favicon request timeout' });
+		}
+		console.error('Favicon proxy error:', error.message);
 		return reply.code(500).send({ error: 'Internal server error' });
 	}
 });
 
-
-// Epoxy transport (encrypted proxy data)
 fastify.register(fastifyStatic, {
 	root: epoxyPath,
 	prefix: "/epoxy/",
 	decorateReply: false,
+	cacheControl: true,
+	maxAge: 86400000
 });
 
-// Baremux client scripts
 fastify.register(fastifyStatic, {
 	root: baremuxPath,
 	prefix: "/baremux/",
 	decorateReply: false,
+	cacheControl: true,
+	maxAge: 86400000
 });
 
-// Custom error handler to prevent leaking stack traces in production
+fastify.get("/health", (req, reply) => {
+	reply.send({ 
+		status: 'ok', 
+		uptime: process.uptime(),
+		connections: activeConnections.size
+	});
+});
+
 fastify.setErrorHandler((error, request, reply) => {
 	fastify.log.error(error);
 	reply.status(500).send({ error: 'Internal Server Error' });
 });
 
-// Graceful shutdown handler
-// This ensures we close all connections properly when terminating
 async function shutdown() {
+	console.log('Shutting down gracefully...');
+	
+	for (const socket of activeConnections) {
+		try {
+			socket.end();
+		} catch (e) {
+		}
+	}
+	activeConnections.clear();
+	
 	try {
 		await fastify.close();
+		console.log('Server closed');
 		process.exit(0);
 	} catch (err) {
 		fastify.log.error(err);

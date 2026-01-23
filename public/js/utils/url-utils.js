@@ -1,4 +1,13 @@
+const urlDecodeCache = new Map();
+const DECODE_CACHE_SIZE = 100;
+
 function decodeProxiedUrl(proxiedUrl) {
+  if (urlDecodeCache.has(proxiedUrl)) {
+    return urlDecodeCache.get(proxiedUrl);
+  }
+  
+  let result = null;
+  
   try {
     const url = new URL(proxiedUrl);
 
@@ -8,53 +17,63 @@ function decodeProxiedUrl(proxiedUrl) {
         try {
           const decoded = decodeURIComponent(encodedUrl);
           if (decoded.startsWith('http')) {
-            return decoded;
+            result = decoded;
+          } else {
+            result = atob(encodedUrl);
           }
-          return atob(encodedUrl);
         } catch (e) {
-          return encodedUrl;
+          result = encodedUrl;
         }
       }
+    } else if (url.searchParams.has('url')) {
+      result = url.searchParams.get('url');
+    } else {
+      const pathMatch = url.pathname.match(/^\/proxy\/(.+)$/);
+      if (pathMatch) {
+        result = decodeURIComponent(pathMatch[1]);
+      }
     }
-
-    if (url.searchParams.has('url')) {
-      return url.searchParams.get('url');
-    }
-
-    const pathMatch = url.pathname.match(/^\/proxy\/(.+)$/);
-    if (pathMatch) {
-      return decodeURIComponent(pathMatch[1]);
-    }
-
-    return null;
   } catch (e) {
-    return null;
+    result = null;
   }
+  
+  if (urlDecodeCache.size >= DECODE_CACHE_SIZE) {
+    const firstKey = urlDecodeCache.keys().next().value;
+    urlDecodeCache.delete(firstKey);
+  }
+  urlDecodeCache.set(proxiedUrl, result);
+  
+  return result;
 }
 
 function getOriginalUrl(url) {
   if (!url) return '';
 
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    if (url.includes('/scramjet/') && url.includes(location.origin)) {
-      try {
-        const urlObj = new URL(url);
-        if (urlObj.pathname.startsWith('/scramjet/')) {
-          const encodedUrl = urlObj.pathname.substring('/scramjet/'.length);
-          try {
-            const decoded = decodeURIComponent(encodedUrl);
-            if (decoded.startsWith('http')) {
-              return decoded;
+    if (!url.includes('/scramjet/') || !url.includes(location.origin)) {
+      return url;
+    }
+    
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.pathname.startsWith('/scramjet/')) {
+        const encodedUrl = urlObj.pathname.substring('/scramjet/'.length);
+        try {
+          const decoded = decodeURIComponent(encodedUrl);
+          if (decoded.startsWith('http')) {
+            if (decoded.includes('/scramjet/') && decoded.includes(location.origin)) {
+              return getOriginalUrl(decoded);
             }
-            const base64Decoded = atob(encodedUrl);
-            if (base64Decoded.startsWith('http')) {
-              return base64Decoded;
-            }
-          } catch (e) {
+            return decoded;
           }
+          const base64Decoded = atob(encodedUrl);
+          if (base64Decoded.startsWith('http')) {
+            return base64Decoded;
+          }
+        } catch (e) {
         }
-      } catch (e) {
       }
+    } catch (e) {
     }
     return url;
   }
@@ -69,22 +88,16 @@ function getOriginalUrl(url) {
 
   if (url.includes('/scramjet/')) {
     try {
-      const urlObj = new URL(url);
+      const urlObj = new URL(url, location.origin);
       if (urlObj.pathname.startsWith('/scramjet/')) {
         const encodedUrl = urlObj.pathname.substring('/scramjet/'.length);
         try {
           const decoded = decodeURIComponent(encodedUrl);
           if (decoded.startsWith('http')) {
-            if (decoded.includes("/scramjet/") && decoded.includes(location.origin)) {
-              return getOriginalUrl(decoded);
-            }
             return decoded;
           }
           const base64Decoded = atob(encodedUrl);
           if (base64Decoded.startsWith('http')) {
-            if (base64Decoded.includes("/scramjet/") && base64Decoded.includes(location.origin)) {
-              return getOriginalUrl(base64Decoded);
-            }
             return base64Decoded;
           }
         } catch (e) {
@@ -97,12 +110,18 @@ function getOriginalUrl(url) {
   return url;
 }
 
-function getWebsiteName(url) {
-  try {
-    if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
-      return url;
-    }
+const websiteNameCache = new Map();
 
+function getWebsiteName(url) {
+  if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+    return url || '';
+  }
+  
+  if (websiteNameCache.has(url)) {
+    return websiteNameCache.get(url);
+  }
+
+  try {
     const urlObj = new URL(url);
     let hostname = urlObj.hostname;
 
@@ -110,22 +129,38 @@ function getWebsiteName(url) {
       hostname = hostname.substring(4);
     }
 
+    websiteNameCache.set(url, hostname);
+    
+    if (websiteNameCache.size > 200) {
+      const firstKey = websiteNameCache.keys().next().value;
+      websiteNameCache.delete(firstKey);
+    }
+    
     return hostname;
   } catch (e) {
-    return url.length > 20 ? url.substring(0, 20) + '...' : url;
+    const truncated = url.length > 20 ? url.substring(0, 20) + '...' : url;
+    return truncated;
   }
 }
 
+let addressBarUpdateTimeout = null;
+
 function updateAddressBar(url, tabId) {
-  try {
-    let displayUrl = url;
-
-    const tabsRef = window.tabs || {};
-    const addressBarInput = document.querySelector('.address-bar-input');
-
-    if (displayUrl.startsWith(location.origin + '/scramjet/')) {
-      displayUrl = decodeURIComponent(
-        displayUrl.substring(location.origin.length + '/scramjet/'.length)
+  if (addressBarUpdateTimeout) {
+    clearTimeout(addressBarUpdateTimeout);
+  }
+  
+  addressBarUpdateTimeout = setTimeout(() => {
+    try {
+      const tabsRef = window.tabs || {};
+      const addressBarInput = document.querySelector('.address-bar-input');
+      
+      if (!url.startsWith(location.origin + '/scramjet/')) {
+        return;
+      }
+      
+      const displayUrl = decodeURIComponent(
+        url.substring(location.origin.length + '/scramjet/'.length)
       );
 
       if (tabsRef && tabsRef[tabId]) {
@@ -137,19 +172,17 @@ function updateAddressBar(url, tabId) {
           tabTitle.textContent = tabsRef[tabId].title;
         }
 
-        const saveFunction = window.saveTabsToStorage || (() => { });
-        if (typeof saveFunction === 'function') {
-          saveFunction();
-        }
+        window.saveTabsToStorage?.();
       }
 
-      if (addressBarInput) {
+      if (addressBarInput && window.activeTabId === tabId) {
         addressBarInput.value = displayUrl;
       }
+    } catch (e) {
+      console.error('address bar update error:', e);
     }
-  } catch (e) {
-    console.error('address bar update error:', e);
-  }
+    addressBarUpdateTimeout = null;
+  }, 50);
 }
 
 window.decodeProxiedUrl = decodeProxiedUrl;

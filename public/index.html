@@ -1,11 +1,9 @@
 <!DOCTYPE html>
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <meta name="description" content="Glint Browser - A custom web proxy I built to bypass restrictions">
   <meta property="og:title" content="Glint Browser">
   <meta property="og:description" content="A custom web proxy to bypass restrictions">
@@ -18,39 +16,104 @@
   <meta name="twitter:description" content="A custom web proxy to bypass restrictions">
   <meta name="twitter:image" content="https://glintapp.org/images/page.png">
   <title>Glint Browser</title>
+
+  <link rel="preload" href="images/logo.png" as="image">
+  <link rel="preload" href="css/styles.css" as="style">
+  <link rel="preload" href="js/main.js" as="script">
+
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
   <link rel="icon" type="image/png" href="images/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=1">
-  <link rel="stylesheet" href="css/reviews.css?v=1">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-YCZFXTQFN3"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <style>
+    :root {
+      --bg-primary: #0f0f0f;
+      --bg-secondary: #1a1a1a;
+      --text-primary: #e8e8e8
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      background: #080808;
+      min-height: 100vh
+    }
+
+    .browser {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
+    .browser-header {
+      background: var(--bg-secondary);
+      height: 44px
+    }
+
+    .toolbar {
+      background: var(--bg-primary);
+      height: 48px
+    }
+  </style>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"
+    media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet">
+  </noscript>
+
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/reviews.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print"
+    onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  </noscript>
+
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
-    }
+    function gtag() { dataLayer.push(arguments); }
     gtag("js", new Date());
     gtag("config", "G-YCZFXTQFN3");
+    window.addEventListener('load', function () {
+      var s = document.createElement('script');
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-YCZFXTQFN3';
+      s.async = true;
+      document.head.appendChild(s);
+    });
   </script>
-  <script src="js/utils/url-utils.js?v=1" defer=""></script>
-  <script src="js/utils/favicon.js?v=1" defer=""></script>
-  <script src="js/utils/proxy-frames.js?v=1" defer=""></script>
-  <script src="js/tabs/tab-history.js?v=1" defer=""></script>
-  <script src="js/tabs/tab-storage.js?v=1" defer=""></script>
-  <script src="js/tabs/tab-dragging.js?v=1" defer=""></script>
-  <script src="js/tabs/tab-management.js?v=1" defer=""></script>
-  <script src="js/navigation/navigation.js?v=1" defer=""></script>
-  <script src="js/main.js?v=1" defer=""></script>
-  <script src="js/search.js?v=1" defer=""></script>
-  <script src="js/proxy-config.js?v=1" defer=""></script>
-  <script src="js/options.js?v=1" defer=""></script>
-  <script src="js/register-sw.js?v=1" defer=""></script>
-  <script src="js/reviews-carousel.js?v=1" defer=""></script>
-  <!-- proxy deps -->
-  <script src="baremux/index.js" defer=""></script>
-  <script src="epoxy/index.js" defer=""></script>
+
+  <script src="baremux/index.js" defer></script>
+  <script src="epoxy/index.js" defer></script>
+
+  <script src="js/utils/url-utils.js" defer></script>
+  <script src="js/utils/favicon.js" defer></script>
+  <script src="js/utils/proxy-frames.js" defer></script>
+
+  <script src="js/tabs/tab-history.js" defer></script>
+  <script src="js/tabs/tab-storage.js" defer></script>
+  <script src="js/tabs/tab-dragging.js" defer></script>
+  <script src="js/tabs/tab-management.js" defer></script>
+
+  <script src="js/navigation/navigation.js" defer></script>
+  <script src="js/search.js" defer></script>
+  <script src="js/proxy-config.js" defer></script>
+  <script src="js/options.js" defer></script>
+  <script src="js/main.js" defer></script>
+
+  <script src="js/register-sw.js" defer></script>
+  <script src="js/reviews-carousel.js" defer></script>
 </head>
 
 <body>
