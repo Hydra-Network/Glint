@@ -24,8 +24,9 @@ const fastify = Fastify({
 	serverFactory: (handler) => {
 		return createServer()
 			.on("request", (req, res) => {
-				const path = (req.url || "").split("?")[0];
-				if (path !== "/ad.html") {
+				const pathname = (req.url || "").split("?")[0];
+				const isMainDoc = pathname === "/" || pathname === "/index.html";
+				if (!isMainDoc) {
 					res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
 					res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
 				}
