@@ -24,8 +24,11 @@ const fastify = Fastify({
 	serverFactory: (handler) => {
 		return createServer()
 			.on("request", (req, res) => {
-				res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-				res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+				const path = (req.url || "").split("?")[0];
+				if (path !== "/ad.html") {
+					res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+					res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+				}
 				res.setHeader("Connection", "keep-alive");
 				res.setHeader("Keep-Alive", "timeout=30, max=1000");
 				handler(req, res);
