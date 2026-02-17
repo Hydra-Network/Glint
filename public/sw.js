@@ -7,6 +7,7 @@ const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/ad.html',
   '/css/styles.css',
   '/css/reviews.css',
   '/images/logo.png',
@@ -93,7 +94,14 @@ async function handleRequest(event) {
   
   if (AD_DOMAINS.has(url.hostname) || 
       [...AD_DOMAINS].some(domain => url.hostname.includes(domain))) {
-    return fetch(event.request);
+    try {
+      return await fetch(event.request);
+    } catch (e) {
+      return new Response('', {
+        status: 200,
+        headers: { 'Content-Type': 'application/javascript' }
+      });
+    }
   }
   
   if (event.request.url.includes('favicon.ico') || 
