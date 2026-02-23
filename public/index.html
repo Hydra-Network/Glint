@@ -33,7 +33,8 @@
     :root {
       --bg-primary: #0f0f0f;
       --bg-secondary: #1a1a1a;
-      --text-primary: #e8e8e8
+      --text-primary: #ffffff;
+      --text-secondary: #d0d0d0
     }
 
     * {
@@ -43,7 +44,7 @@
     }
 
     body {
-      background: #080808;
+      background: #0f0f0f;
       min-height: 100vh
     }
 
@@ -73,7 +74,6 @@
   </noscript>
 
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/reviews.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print"
     onload="this.media='all'">
@@ -113,7 +113,6 @@
   <script src="js/main.js" defer></script>
 
   <script src="js/register-sw.js" defer></script>
-  <script src="js/reviews-carousel.js" defer></script>
 </head>
 
 <body>
@@ -170,146 +169,28 @@
                 <input type="text" class="main-search-input" placeholder="Search or enter a site URL">
               </div>
             </div>
-          </div>
 
-          <div class="reviews-container">
-            <h2 class="reviews-title">Join tons of users browsing with Glint</h2>
-
-            <div class="reviews-wrapper">
-              <div class="reviews-grid">
-                <!-- NC Review -->
-                <div class="review-card">
-                  <div class="review-stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                      class="fas fa-star"></i><i class="fas fa-star"></i>
-                  </div>
-                  <div class="review-header">
-                    <img src="images/Reviewpfp's/NC.png" alt="NC" class="review-pfp">
-                    <div class="review-author-info">
-                      <span class="review-author">NC</span>
-                      <span class="review-role">Owner of Shadow</span>
-                    </div>
-                    <span class="review-verified"><i class="fas fa-check"></i> Verified</span>
-                  </div>
-                  <p class="review-text">"I love glint, it's fast, simple, and reliable."</p>
-                </div>
-
-                <!-- Nocaptions Review -->
-                <div class="review-card">
-                  <div class="review-stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                      class="fas fa-star"></i><i class="fas fa-star"></i>
-                  </div>
-                  <div class="review-header">
-                    <img src="images/Reviewpfp's/nocaptions.png" alt="Nocaptions" class="review-pfp">
-                    <div class="review-author-info">
-                      <span class="review-author">Nocaptions</span>
-                    </div>
-                    <span class="review-verified"><i class="fas fa-check"></i> Verified</span>
-                  </div>
-                  <p class="review-text">"Without Glint I wouldn't be able to access blocked sites."</p>
-                </div>
-
-                <!-- testuserforlearning Review -->
-                <div class="review-card">
-                  <div class="review-stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                      class="fas fa-star"></i>
-                  </div>
-                  <div class="review-header">
-                    <img src="images/Reviewpfp's/testuserforlearning.png" alt="testuserforlearning" class="review-pfp">
-                    <div class="review-author-info">
-                      <span class="review-author">testuserforlearning</span>
-                      <span class="review-role">Owner of Bromine</span>
-                    </div>
-                    <span class="review-verified"><i class="fas fa-check"></i> Verified</span>
-                  </div>
-                  <p class="review-text">"Looks like Chrome"</p>
-                </div>
-
-                <!-- .slayer Review -->
-                <div class="review-card">
-                  <div class="review-stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                      class="fas fa-star"></i>
-                  </div>
-                  <div class="review-header">
-                    <img src="images/Reviewpfp's/slayer.png" alt=".slayer" class="review-pfp">
-                    <div class="review-author-info">
-                      <span class="review-author">.slayer</span>
-                      <span class="review-role">Owner of Rosin</span>
-                    </div>
-                    <span class="review-verified"><i class="fas fa-check"></i> Verified</span>
-                  </div>
-                  <p class="review-text">"4.5 for aesthetics, 3.5 for usability"</p>
-                </div>
-
-                <!-- s16 Review -->
-                <div class="review-card">
-                  <div class="review-stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                      class="fas fa-star"></i>
-                  </div>
-                  <div class="review-header">
-                    <img src="images/Reviewpfp's/s16.png" alt="s16" class="review-pfp">
-                    <div class="review-author-info">
-                      <span class="review-author">s16</span>
-                      <span class="review-role">Owner of Syntra</span>
-                    </div>
-                    <span class="review-verified"><i class="fas fa-check"></i> Verified</span>
-                  </div>
-                  <p class="review-text">"i use glint to goon"</p>
-                </div>
-
-                <!-- Rogo Review -->
-                <div class="review-card">
-                  <div class="review-stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                      class="fas fa-star"></i><i class="fas fa-star"></i>
-                  </div>
-                  <div class="review-header">
-                    <img src="images/Reviewpfp's/rogo.png" alt="Rogo" class="review-pfp">
-                    <div class="review-author-info">
-                      <span class="review-author">Rogo</span>
-                      <span class="review-role">Owner of Hydra Network</span>
-                    </div>
-                    <span class="review-verified"><i class="fas fa-check"></i> Verified</span>
-                  </div>
-                  <p class="review-text">"Glint should replace Chrome"</p>
-                </div>
-
-                <!-- Dr4g0nFly Review -->
-                <div class="review-card">
-                  <div class="review-stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                      class="fas fa-star"></i><i class="fas fa-star"></i>
-                  </div>
-                  <div class="review-header">
-                    <img src="images/Reviewpfp's/Dr4g0nFly.png" alt="Dr4g0nFly" class="review-pfp">
-                    <div class="review-author-info">
-                      <span class="review-author">Dr4g0nFly</span>
-                    </div>
-                    <span class="review-verified"><i class="fas fa-check"></i> Verified</span>
-                  </div>
-                  <p class="review-text">"i can get a victory royal in the middle of class, top tier proxy"</p>
-                </div>
-
-                <!-- You? Review -->
-                <div class="review-card">
-                  <div class="review-stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                      class="fas fa-star"></i><i class="fas fa-star"></i>
-                  </div>
-                  <div class="review-header">
-                    <div class="review-pfp-placeholder"><i class="fas fa-question"></i></div>
-                    <div class="review-author-info">
-                      <span class="review-author">You?</span>
-                    </div>
-                    <span class="review-verified"><i class="fas fa-check"></i> Verified</span>
-                  </div>
-                  <p class="review-text">"This could be your review."</p>
-                </div>
-              </div>
+            <div class="shortcuts">
+              <a href="#" class="shortcut shortcut-yt" data-url="https://www.youtube.com" title="YouTube">
+                <span class="shortcut-icon"><img src="images/youtube.png" alt="" width="32" height="32"></span>
+                <span class="shortcut-label">YouTube</span>
+              </a>
+              <a href="#" class="shortcut shortcut-reddit" data-url="https://www.reddit.com" title="Reddit">
+                <span class="shortcut-icon"><img src="images/reddit.png" alt="" width="32" height="32"></span>
+                <span class="shortcut-label">Reddit</span>
+              </a>
+              <a href="#" class="shortcut shortcut-discord" data-url="https://discord.com" title="Discord">
+                <span class="shortcut-icon"><img src="images/discord.png" alt="" width="32" height="32"></span>
+                <span class="shortcut-label">Discord</span>
+              </a>
+              <a href="#" class="shortcut shortcut-x" data-url="https://x.com" title="X">
+                <span class="shortcut-icon"><img src="images/X.png" alt="" width="32" height="32"></span>
+                <span class="shortcut-label">X</span>
+              </a>
+              <a href="#" class="shortcut shortcut-games" data-url="/games.html" title="Games">
+                <span class="shortcut-icon"><i class="fas fa-dice"></i></span>
+                <span class="shortcut-label">Games</span>
+              </a>
             </div>
           </div>
 
@@ -353,9 +234,30 @@
 
   </div>
 
-  <p class="ads-notice">This website uses ads. If you are using this for work, please head to <a href="https://glintapp.org" target="_blank" rel="noopener">glintapp.org</a>.</p>
+  <script>
+    (function () {
+      function centerNewTabContent() {
+        var page = document.querySelector('.new-tab-page');
+        var container = document.querySelector('.new-tab-container');
+        if (!page || !container) return;
+        var pageHeight = page.offsetHeight;
+        var containerHeight = container.offsetHeight;
+        var offset = Math.max(0, (pageHeight - containerHeight) / 2 - 50);
+        container.style.marginTop = offset + 'px';
+      }
 
-  <script src="https://pl28729637.effectivegatecpm.com/0b/39/aa/0b39aaf7465497e2b772da35a3363c46.js"></script>
+      function run() {
+        centerNewTabContent();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+      } else {
+        run();
+      }
+      window.addEventListener('resize', centerNewTabContent);
+    })();
+  </script>
 </body>
 
 </html>

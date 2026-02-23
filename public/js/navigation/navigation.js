@@ -8,23 +8,58 @@ function navigateTo(url, tabId) {
     tabs[tabId] = { url: '', title: 'New Tab', favicon: '', isNewTab: true };
   }
 
-  const originalUrl = window.getOriginalUrl(url);
-
-  if (!originalUrl || (!originalUrl.startsWith('http://') && !originalUrl.startsWith('https://'))) {
+  let originalUrl = (window.getOriginalUrl && window.getOriginalUrl(url)) || url;
+  if (!originalUrl || typeof originalUrl !== 'string') {
     console.error('invalid url:', originalUrl);
     return;
   }
+  const isPath = originalUrl.startsWith('/');
+  if (!isPath && !originalUrl.startsWith('http://') && !originalUrl.startsWith('https://')) {
+    console.error('invalid url:', originalUrl);
+    return;
+  }
+  if (isPath) originalUrl = window.location.origin + originalUrl;
 
   tabs[tabId].url = originalUrl;
-  tabs[tabId].title = window.getWebsiteName(originalUrl);
+  if (isPath) {
+    const name = (originalUrl.split('/').filter(Boolean).pop() || 'page').replace(/\.(html?|php)$/i, '');
+    tabs[tabId].title = name.charAt(0).toUpperCase() + name.slice(1);
+  } else {
+    tabs[tabId].title = window.getWebsiteName(originalUrl);
+  }
   tabs[tabId].isNewTab = false;
 
   const tabTitle = document.querySelector(`.tab[data-tab-id="${tabId}"] .tab-title`);
-  if (tabTitle) {
-    tabTitle.textContent = tabs[tabId].title;
-  }
-
+  if (tabTitle) tabTitle.textContent = tabs[tabId].title;
   window.saveTabsToStorage(true);
+
+  if (isPath) {
+    const pathname = new URL(originalUrl).pathname;
+    let proxyFrame = document.getElementById(`proxy-frame-${tabId}`);
+    if (!proxyFrame && proxyFramesContainer) proxyFrame = window.createProxyFrame(tabId, proxyFramesContainer);
+    if (!proxyFrame) return;
+
+    newTabPage.style.display = 'none';
+    if (proxyFramesContainer) {
+      proxyFramesContainer.classList.add('active');
+      proxyFramesContainer.style.pointerEvents = 'auto';
+      proxyFramesContainer.style.zIndex = '100';
+    }
+    const browserContent = document.querySelector('.browser-content');
+    if (browserContent) browserContent.classList.add('frame-active');
+
+    document.querySelectorAll('.proxy-frame').forEach((frame) => {
+      const active = frame.id === `proxy-frame-${tabId}`;
+      frame.style.display = active ? 'block' : 'none';
+      if (active) {
+        frame.classList.add('visible');
+        frame.style.pointerEvents = 'auto';
+        proxyFrame.src = pathname;
+      }
+    });
+    if (addressBarInput) addressBarInput.value = originalUrl;
+    return;
+  }
 
   try {
     const urlObj = new URL(originalUrl);

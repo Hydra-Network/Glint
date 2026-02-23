@@ -60,7 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
     mainSearchInput.classList.remove('focused');
   });
 
-  window.addEventListener('glint:settings-updated', () => {
-    // settings updated
+  window.addEventListener('glint:settings-updated', () => {});
+
+  document.querySelectorAll('.shortcut[data-url]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const url = el.getAttribute('data-url');
+      if (!url) return;
+      if (window.navigateTo) {
+        const tabId = window.activeTabId || 'newtab';
+        window.navigateTo(url, tabId);
+      }
+    });
   });
 });
