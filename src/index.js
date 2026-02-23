@@ -19,10 +19,9 @@ let indexHtmlWithInlineCss = null;
 function getIndexWithInlineCss() {
 	if (indexHtmlWithInlineCss) return indexHtmlWithInlineCss;
 	try {
-		const css = readFileSync(path.join(publicDir, 'css', 'styles.css'), 'utf8');
+		const css = readFileSync(path.join(publicDir, 'css', 'loading.css'), 'utf8');
 		let html = readFileSync(path.join(publicDir, 'index.html'), 'utf8');
-		html = html.replace(/<link rel="preload" href="\/css\/styles.css" as="style">\s*\n?/g, '');
-		html = html.replace(/<link rel="stylesheet" href="\/css\/styles.css">/, '<style>' + css + '</style>');
+		html = html.replace(/<link rel="stylesheet" href="[^"]*loading\.css"[^>]*\/?>/, '<style>' + css + '</style>');
 		indexHtmlWithInlineCss = html;
 	} catch (e) {
 		console.error('Failed to inline CSS:', e.message);
@@ -92,8 +91,8 @@ fastify.register(fastifyCompress, {
 	customTypes: /^(?!image\/|video\/|audio\/|application\/octet-stream)/
 });
 
-fastify.get("/css/styles.css", (req, reply) => {
-	return reply.type("text/css; charset=utf-8").sendFile("css/styles.css", publicDir);
+fastify.get("/css/loading.css", (req, reply) => {
+	return reply.type("text/css; charset=utf-8").sendFile("css/loading.css", publicDir);
 });
 
 fastify.register(fastifyStatic, {

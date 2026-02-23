@@ -7,7 +7,7 @@ const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/css/styles.css',
+  '/css/loading.css',
   '/css/reviews.css',
   '/images/logo.png',
   '/images/favicon.png',
