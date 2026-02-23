@@ -1,7 +1,7 @@
 function createProxyFrame(tabId, container) {
   const frame = document.createElement('iframe');
-  frame.id = `proxy-frame-${tabId}`;
-  frame.className = 'proxy-frame';
+  frame.id = `frame-${tabId}`;
+  frame.className = 'frame';
   frame.style.cssText = 'display:none;border:none;width:100%;height:calc(100vh - 92px);pointer-events:auto;position:relative;z-index:10;overflow:auto';
   
   frame.setAttribute('loading', 'eager');

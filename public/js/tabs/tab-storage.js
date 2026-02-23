@@ -93,7 +93,7 @@ function restoreTabsFromStorage(createTabElement, initializeTab, createProxyFram
     if (existingNewTab) {
       existingNewTab.remove();
       delete tabs['newtab'];
-      const newTabFrame = document.getElementById('proxy-frame-newtab');
+      const newTabFrame = document.getElementById('frame-newtab');
       if (newTabFrame) newTabFrame.remove();
     }
 
@@ -110,7 +110,7 @@ function restoreTabsFromStorage(createTabElement, initializeTab, createProxyFram
       }
 
       const newTabElement = createTabElement(tabId, tabData);
-      tabsContainer.insertBefore(newTabElement, document.querySelector('.new-tab-btn'));
+      tabsContainer.insertBefore(newTabElement, document.querySelector('.add-tab'));
       initializeTab(newTabElement);
 
       createProxyFrame(tabId);

@@ -55,7 +55,7 @@
       flex-direction: column
     }
 
-    .browser-header {
+    .top-bar {
       background: var(--bg-secondary);
       height: 44px
     }
@@ -117,22 +117,22 @@
 
 <body>
   <div class="browser">
-    <div class="browser-header">
+    <div class="top-bar">
       <div class="tabs">
         <div class="tab active" data-tab-id="newtab">
-          <div class="tab-favicon-placeholder">
+          <div class="tab-fav">
             <img src="images/logo.png" alt="Glint Logo" class="tab-logo">
           </div>
           <span class="tab-title">New Tab</span>
           <span class="tab-close"><i class="fas fa-times"></i></span>
         </div>
-        <div class="new-tab-btn">
+        <div class="add-tab">
           <i class="fas fa-plus"></i>
         </div>
       </div>
     </div>
     <div class="toolbar">
-      <div class="navigation-controls">
+      <div class="nav-btns">
         <button class="nav-btn back-btn" aria-label="Go back">
           <i class="fas fa-arrow-left"></i>
         </button>
@@ -143,9 +143,9 @@
           <i class="fas fa-redo"></i>
         </button>
       </div>
-      <div class="address-bar-container">
-        <span class="address-bar-lock"><i class="fas fa-lock"></i></span>
-        <input type="text" class="address-bar-input" placeholder="Search or enter a URL">
+      <div class="url-bar">
+        <span class="url-bar-lock"><i class="fas fa-lock"></i></span>
+        <input type="text" class="url-input" placeholder="Search or enter a URL">
       </div>
       <div class="toolbar-actions">
         <button class="action-btn menu-btn" aria-label="More options">
@@ -153,43 +153,43 @@
         </button>
       </div>
     </div>
-    <div class="browser-content">
-      <div class="new-tab-page">
-        <div class="new-tab-container">
-          <div class="hero-section">
-            <div class="logo-container">
+    <div class="view">
+      <div class="start-page">
+        <div class="start-inner">
+          <div class="welcome">
+            <div class="logo-wrap">
               <img src="images/logo.png" alt="Glint Logo" class="main-logo">
             </div>
 
-            <div class="search-container">
+            <div class="search-wrap">
               <div class="search-bar">
                 <div class="search-icon">
                   <i class="fas fa-search"></i>
                 </div>
-                <input type="text" class="main-search-input" placeholder="Search or enter a site URL">
+                <input type="text" class="search-input" placeholder="Search or enter a site URL">
               </div>
             </div>
 
-            <div class="shortcuts">
-              <a href="#" class="shortcut shortcut-yt" data-url="https://www.youtube.com" title="YouTube">
-                <span class="shortcut-icon"><img src="images/youtube.png" alt="" width="32" height="32"></span>
-                <span class="shortcut-label">YouTube</span>
+            <div class="quick-links">
+              <a href="#" class="qlink qlink-yt" data-url="https://www.youtube.com" title="YouTube">
+                <span class="qlink-icon"><img src="images/youtube.png" alt="" width="32" height="32"></span>
+                <span class="qlink-label">YouTube</span>
               </a>
-              <a href="#" class="shortcut shortcut-reddit" data-url="https://www.reddit.com" title="Reddit">
-                <span class="shortcut-icon"><img src="images/reddit.png" alt="" width="32" height="32"></span>
-                <span class="shortcut-label">Reddit</span>
+              <a href="#" class="qlink qlink-reddit" data-url="https://www.reddit.com" title="Reddit">
+                <span class="qlink-icon"><img src="images/reddit.png" alt="" width="32" height="32"></span>
+                <span class="qlink-label">Reddit</span>
               </a>
-              <a href="#" class="shortcut shortcut-discord" data-url="https://discord.com" title="Discord">
-                <span class="shortcut-icon"><img src="images/discord.png" alt="" width="32" height="32"></span>
-                <span class="shortcut-label">Discord</span>
+              <a href="#" class="qlink qlink-discord" data-url="https://discord.com" title="Discord">
+                <span class="qlink-icon"><img src="images/discord.png" alt="" width="32" height="32"></span>
+                <span class="qlink-label">Discord</span>
               </a>
-              <a href="#" class="shortcut shortcut-x" data-url="https://x.com" title="X">
-                <span class="shortcut-icon"><img src="images/X.png" alt="" width="32" height="32"></span>
-                <span class="shortcut-label">X</span>
+              <a href="#" class="qlink qlink-x" data-url="https://x.com" title="X">
+                <span class="qlink-icon"><img src="images/X.png" alt="" width="32" height="32"></span>
+                <span class="qlink-label">X</span>
               </a>
-              <a href="#" class="shortcut shortcut-games" data-url="/games.html" title="Games">
-                <span class="shortcut-icon"><i class="fas fa-dice"></i></span>
-                <span class="shortcut-label">Games</span>
+              <a href="#" class="qlink qlink-games" data-url="/games.html" title="Games">
+                <span class="qlink-icon"><i class="fas fa-dice"></i></span>
+                <span class="qlink-label">Games</span>
               </a>
             </div>
           </div>
@@ -203,7 +203,7 @@
         </div>
       </div>
 
-      <div id="proxy-frames-container"></div>
+      <div id="frames"></div>
     </div>
   </div>
 
@@ -236,26 +236,23 @@
 
   <script>
     (function () {
-      function centerNewTabContent() {
-        var page = document.querySelector('.new-tab-page');
-        var container = document.querySelector('.new-tab-container');
-        if (!page || !container) return;
-        var pageHeight = page.offsetHeight;
-        var containerHeight = container.offsetHeight;
-        var offset = Math.max(0, (pageHeight - containerHeight) / 2 - 50);
-        container.style.marginTop = offset + 'px';
+      function centerStartPage() {
+        var page = document.querySelector('.start-page');
+        var inner = document.querySelector('.start-inner');
+        if (!page || !inner) return;
+        var pageH = page.offsetHeight;
+        var innerH = inner.offsetHeight;
+        var offset = Math.max(0, (pageH - innerH) / 2 - 50);
+        inner.style.marginTop = offset + 'px';
       }
 
-      function run() {
-        centerNewTabContent();
-      }
-
+      function run() { centerStartPage(); }
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', run);
       } else {
         run();
       }
-      window.addEventListener('resize', centerNewTabContent);
+      window.addEventListener('resize', centerStartPage);
     })();
   </script>
 </body>

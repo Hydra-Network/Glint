@@ -1,8 +1,8 @@
 function navigateTo(url, tabId) {
   const tabs = window.tabs || {};
-  const newTabPage = document.querySelector('.new-tab-page');
-  const addressBarInput = document.querySelector('.address-bar-input');
-  const proxyFramesContainer = document.getElementById('proxy-frames-container');
+  const startPage = document.querySelector('.start-page');
+  const urlInput = document.querySelector('.url-input');
+  const framesEl = document.getElementById('frames');
 
   if (!tabs[tabId]) {
     tabs[tabId] = { url: '', title: 'New Tab', favicon: '', isNewTab: true };
@@ -35,29 +35,29 @@ function navigateTo(url, tabId) {
 
   if (isPath) {
     const pathname = new URL(originalUrl).pathname;
-    let proxyFrame = document.getElementById(`proxy-frame-${tabId}`);
-    if (!proxyFrame && proxyFramesContainer) proxyFrame = window.createProxyFrame(tabId, proxyFramesContainer);
-    if (!proxyFrame) return;
+    let frameEl = document.getElementById(`frame-${tabId}`);
+    if (!frameEl && framesEl) frameEl = window.createProxyFrame(tabId, framesEl);
+    if (!frameEl) return;
 
-    newTabPage.style.display = 'none';
-    if (proxyFramesContainer) {
-      proxyFramesContainer.classList.add('active');
-      proxyFramesContainer.style.pointerEvents = 'auto';
-      proxyFramesContainer.style.zIndex = '100';
+    startPage.style.display = 'none';
+    if (framesEl) {
+      framesEl.classList.add('active');
+      framesEl.style.pointerEvents = 'auto';
+      framesEl.style.zIndex = '100';
     }
-    const browserContent = document.querySelector('.browser-content');
-    if (browserContent) browserContent.classList.add('frame-active');
+    const view = document.querySelector('.view');
+    if (view) view.classList.add('frame-active');
 
-    document.querySelectorAll('.proxy-frame').forEach((frame) => {
-      const active = frame.id === `proxy-frame-${tabId}`;
+    document.querySelectorAll('.frame').forEach((frame) => {
+      const active = frame.id === `frame-${tabId}`;
       frame.style.display = active ? 'block' : 'none';
       if (active) {
         frame.classList.add('visible');
         frame.style.pointerEvents = 'auto';
-        proxyFrame.src = pathname;
+        frameEl.src = pathname;
       }
     });
-    if (addressBarInput) addressBarInput.value = originalUrl;
+    if (urlInput) urlInput.value = originalUrl;
     return;
   }
 
@@ -109,14 +109,11 @@ function navigateTo(url, tabId) {
     console.log('Error preloading favicon:', err);
   }
 
-  let proxyFrame = document.getElementById(`proxy-frame-${tabId}`);
+  let proxyFrame = document.getElementById(`frame-${tabId}`);
   if (!proxyFrame) {
-    const proxyFramesContainer = document.getElementById('proxy-frames-container');
-    if (!proxyFramesContainer) {
-      console.error('Proxy frames container not found');
-      return;
-    }
-    proxyFrame = window.createProxyFrame(tabId, proxyFramesContainer);
+    const framesEl = document.getElementById('frames');
+    if (!framesEl) return;
+    proxyFrame = window.createProxyFrame(tabId, framesEl);
   }
 
   const attemptNavigation = () => {
@@ -128,21 +125,17 @@ function navigateTo(url, tabId) {
     proxyFrame.classList.add('loading');
 
     try {
-      const browserContent = document.querySelector('.browser-content');
-      newTabPage.style.display = 'none';
-
-      if (proxyFramesContainer) {
-        proxyFramesContainer.classList.add('active');
-        proxyFramesContainer.style.pointerEvents = 'auto';
-        proxyFramesContainer.style.zIndex = '100';
+      startPage.style.display = 'none';
+      if (framesEl) {
+        framesEl.classList.add('active');
+        framesEl.style.pointerEvents = 'auto';
+        framesEl.style.zIndex = '100';
       }
+      const view = document.querySelector('.view');
+      if (view) view.classList.add('frame-active');
 
-      if (browserContent) {
-        browserContent.classList.add('frame-active');
-      }
-
-      document.querySelectorAll('.proxy-frame').forEach(frame => {
-        const isActive = frame.id === `proxy-frame-${tabId}`;
+      document.querySelectorAll('.frame').forEach(frame => {
+        const isActive = frame.id === `frame-${tabId}`;
         frame.style.display = isActive ? 'block' : 'none';
 
         if (isActive) {
@@ -216,7 +209,7 @@ function navigateTo(url, tabId) {
       };
 
       proxyFrame.src = encodedUrl;
-      addressBarInput.value = originalUrl;
+      urlInput.value = originalUrl;
     } catch (err) {
       console.error('navigation error:', err);
       proxyFrame.classList.remove('loading');
@@ -255,9 +248,9 @@ function handleSearch(searchTerm, tabId) {
 function initNavigationControls() {
   const tabs = window.tabs || {};
   const activeTabId = window.activeTabId || 'newtab';
-  const addressBarInput = document.querySelector('.address-bar-input');
-  const mainSearchInput = document.querySelector('.main-search-input');
-  const newTabPage = document.querySelector('.new-tab-page');
+  const urlInput = document.querySelector('.url-input');
+  const searchInput = document.querySelector('.search-input');
+  const startPage = document.querySelector('.start-page');
 
   document.querySelector('.back-btn')?.addEventListener('click', (e) => {
     e.preventDefault();
@@ -271,7 +264,7 @@ function initNavigationControls() {
 
         tabs[currentActiveTabId].isHistoryNavigation = true;
 
-        const proxyFrame = document.getElementById(`proxy-frame-${currentActiveTabId}`);
+        const proxyFrame = document.getElementById(`frame-${currentActiveTabId}`);
         if (proxyFrame && window.scramjet) {
           proxyFrame.classList.add('loading');
 
@@ -287,7 +280,7 @@ function initNavigationControls() {
 
               tabs[currentActiveTabId].url = urlToEncode;
               tabs[currentActiveTabId].title = window.getWebsiteName(urlToEncode);
-              addressBarInput.value = urlToEncode;
+              urlInput.value = urlToEncode;
 
               const tabTitle = document.querySelector(`.tab[data-tab-id="${currentActiveTabId}"] .tab-title`);
               if (tabTitle) {
@@ -352,7 +345,7 @@ function initNavigationControls() {
 
         tabs[currentActiveTabId].isHistoryNavigation = true;
 
-        const proxyFrame = document.getElementById(`proxy-frame-${currentActiveTabId}`);
+        const proxyFrame = document.getElementById(`frame-${currentActiveTabId}`);
         if (proxyFrame && window.scramjet) {
           proxyFrame.classList.add('loading');
 
@@ -368,7 +361,7 @@ function initNavigationControls() {
 
               tabs[currentActiveTabId].url = urlToEncode;
               tabs[currentActiveTabId].title = window.getWebsiteName(urlToEncode);
-              addressBarInput.value = urlToEncode;
+              urlInput.value = urlToEncode;
 
               const tabTitle = document.querySelector(`.tab[data-tab-id="${currentActiveTabId}"] .tab-title`);
               if (tabTitle) {
@@ -427,7 +420,7 @@ function initNavigationControls() {
 
     const currentActiveTabId = window.activeTabId || 'newtab';
     if (tabs[currentActiveTabId] && !tabs[currentActiveTabId].isNewTab) {
-      const proxyFrame = document.getElementById(`proxy-frame-${currentActiveTabId}`);
+      const proxyFrame = document.getElementById(`frame-${currentActiveTabId}`);
       if (proxyFrame && window.scramjet) {
         const currentUrl = tabs[currentActiveTabId].url || '';
         if (!currentUrl) {
@@ -488,8 +481,8 @@ function initNavigationControls() {
         attemptReload();
       }
     } else {
-      if (mainSearchInput) mainSearchInput.value = '';
-      if (addressBarInput) addressBarInput.value = '';
+      if (searchInput) searchInput.value = '';
+      if (urlInput) urlInput.value = '';
     }
 
     return false;

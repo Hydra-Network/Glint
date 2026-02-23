@@ -24,11 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.scramjet = scramjet;
 
   const tabsContainer = document.querySelector(".tabs");
-  const newTabButton = document.querySelector(".new-tab-btn");
-  const addressBarInput = document.querySelector(".address-bar-input");
-  const mainSearchInput = document.querySelector(".main-search-input");
-  const browserContent = document.querySelector(".browser-content");
-  const newTabPage = document.querySelector('.new-tab-page');
+  const addTabBtn = document.querySelector(".add-tab");
+  const urlInput = document.querySelector(".url-input");
+  const searchInput = document.querySelector(".search-input");
+  const view = document.querySelector(".view");
+  const startPage = document.querySelector('.start-page');
 
   const tabs = {};
   let activeTabId = 'newtab';
@@ -48,24 +48,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   window.initTabHistory('newtab');
 
-  let proxyFramesContainer = document.getElementById('proxy-frames-container');
-  if (!proxyFramesContainer) {
-    proxyFramesContainer = document.createElement('div');
-    proxyFramesContainer.id = 'proxy-frames-container';
-    browserContent.appendChild(proxyFramesContainer);
+  let framesEl = document.getElementById('frames');
+  if (!framesEl) {
+    framesEl = document.createElement('div');
+    framesEl.id = 'frames';
+    view.appendChild(framesEl);
   }
 
-  proxyFramesContainer.style.width = '100%';
-  proxyFramesContainer.style.height = '100%';
-  proxyFramesContainer.style.position = 'absolute';
-  proxyFramesContainer.style.top = '0';
-  proxyFramesContainer.style.left = '0';
-  proxyFramesContainer.style.pointerEvents = 'none';
-  proxyFramesContainer.style.zIndex = '1';
+  framesEl.style.width = '100%';
+  framesEl.style.height = '100%';
+  framesEl.style.position = 'absolute';
+  framesEl.style.top = '0';
+  framesEl.style.left = '0';
+  framesEl.style.pointerEvents = 'none';
+  framesEl.style.zIndex = '1';
 
   setTimeout(() => {
-    if (window.createProxyFrame && !document.getElementById('proxy-frame-newtab')) {
-      window.createProxyFrame('newtab', proxyFramesContainer);
+    if (window.createProxyFrame && !document.getElementById('frame-newtab')) {
+      window.createProxyFrame('newtab', framesEl);
     }
   }, 100);
 
@@ -75,14 +75,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const result = window.restoreTabsFromStorage(
       window.createTabElement,
       window.initializeTab,
-      (tabId) => window.createProxyFrame(tabId, proxyFramesContainer)
+      (tabId) => window.createProxyFrame(tabId, framesEl)
     );
 
     activeTabId = result.activeTabId || 'newtab';
     window.activeTabId = activeTabId;
 
-    if (!document.getElementById(`proxy-frame-${activeTabId}`)) {
-      window.createProxyFrame(activeTabId, proxyFramesContainer);
+    if (!document.getElementById(`frame-${activeTabId}`)) {
+      window.createProxyFrame(activeTabId, framesEl);
     }
 
     const prevSave = window.saveTabsToStorage;
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const originalUrl = window.getOriginalUrl(url);
 
         setTimeout(() => {
-          const proxyFrame = document.getElementById(`proxy-frame-${tabId}`);
+          const proxyFrame = document.getElementById(`frame-${tabId}`);
           if (proxyFrame && window.scramjet && originalUrl) {
             const attemptRestoreNavigation = () => {
               if (!window.scramjet || !window.scramjet.encodeUrl) {
@@ -121,20 +121,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 proxyFrame.classList.add('loading');
 
                 if (tabId === activeTabId) {
-                  newTabPage.style.display = 'none';
+                  startPage.style.display = 'none';
 
-                  if (proxyFramesContainer) {
-                    proxyFramesContainer.classList.add('active');
-                    proxyFramesContainer.style.pointerEvents = 'auto';
-                    proxyFramesContainer.style.zIndex = '100';
+                  if (framesEl) {
+                    framesEl.classList.add('active');
+                    framesEl.style.pointerEvents = 'auto';
+                    framesEl.style.zIndex = '100';
                   }
 
-                  if (browserContent) {
-                    browserContent.classList.add('frame-active');
-                  }
+                  if (view) view.classList.add('frame-active');
 
-                  document.querySelectorAll('.proxy-frame').forEach(frame => {
-                    const isActive = frame.id === `proxy-frame-${tabId}`;
+                  document.querySelectorAll('.frame').forEach(frame => {
+                    const isActive = frame.id === `frame-${tabId}`;
                     frame.style.display = isActive ? 'block' : 'none';
 
                     if (isActive) {
@@ -249,8 +247,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   })();
 
-  if (newTabButton) {
-    newTabButton.addEventListener('click', window.createNewTab);
+  if (addTabBtn) {
+    addTabBtn.addEventListener('click', window.createNewTab);
   }
 
   document.querySelectorAll('.tab').forEach(window.initializeTab);

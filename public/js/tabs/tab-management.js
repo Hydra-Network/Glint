@@ -5,7 +5,7 @@ function createTabElement(tabId, tabData) {
 
   const faviconHtml = tabData.favicon
     ? `<img src="${tabData.favicon}" alt="Favicon" class="tab-favicon">`
-    : `<div class="tab-favicon-placeholder"><img src="images/logo.png" alt="Glint Logo" class="tab-logo"></div>`;
+    : `<div class="tab-fav"><img src="images/logo.png" alt="Glint Logo" class="tab-logo"></div>`;
 
   newTabElement.innerHTML = `
     ${faviconHtml}
@@ -34,10 +34,10 @@ function createNewTab() {
 
   const tabsContainer = document.querySelector('.tabs');
   const newTabElement = createTabElement(tabId, tabs[tabId]);
-  tabsContainer.insertBefore(newTabElement, document.querySelector('.new-tab-btn'));
+  tabsContainer.insertBefore(newTabElement, document.querySelector('.add-tab'));
   initializeTab(newTabElement);
 
-  window.createProxyFrame(tabId, document.getElementById('proxy-frames-container'));
+  window.createProxyFrame(tabId, document.getElementById('frames'));
 
   window.setActiveTab(tabId);
   window.updateTabDividers();
@@ -84,7 +84,7 @@ function closeTab(tabId) {
     }
   }
 
-  const proxyFrame = document.getElementById(`proxy-frame-${tabId}`);
+  const proxyFrame = document.getElementById(`frame-${tabId}`);
   if (proxyFrame) proxyFrame.remove();
 
   if (tabs[tabId]?.navigationMonitor) {
@@ -108,9 +108,9 @@ function closeTab(tabId) {
 function setActiveTab(tabId) {
   const tabs = window.tabs || {};
   const prevTabId = window.activeTabId || 'newtab';
-  const newTabPage = document.querySelector('.new-tab-page');
-  const addressBarInput = document.querySelector('.address-bar-input');
-  const proxyFramesContainer = document.getElementById('proxy-frames-container');
+  const startPage = document.querySelector('.start-page');
+  const urlInput = document.querySelector('.url-input');
+  const framesEl = document.getElementById('frames');
 
   window.activeTabId = tabId;
 
@@ -125,38 +125,38 @@ function setActiveTab(tabId) {
     }
   });
 
-  const browserContent = document.querySelector('.browser-content');
+  const view = document.querySelector('.view');
 
   if (tabs[tabId] && tabs[tabId].isNewTab) {
-    newTabPage.style.display = 'flex';
+    startPage.style.display = 'flex';
 
-    document.querySelectorAll('.proxy-frame').forEach(frame => {
+    document.querySelectorAll('.frame').forEach(frame => {
       frame.style.display = 'none';
       frame.classList.remove('visible');
     });
 
-    if (proxyFramesContainer) {
-      proxyFramesContainer.classList.remove('active');
-      proxyFramesContainer.style.pointerEvents = 'none';
-      proxyFramesContainer.style.zIndex = '1';
+    if (framesEl) {
+      framesEl.classList.remove('active');
+      framesEl.style.pointerEvents = 'none';
+      framesEl.style.zIndex = '1';
     }
 
-    if (browserContent) {
-      browserContent.classList.remove('frame-active');
+    if (view) {
+      view.classList.remove('frame-active');
     }
 
-    addressBarInput.value = '';
+    urlInput.value = '';
   } else {
-    newTabPage.style.display = 'none';
+    startPage.style.display = 'none';
 
-    if (proxyFramesContainer) {
-      proxyFramesContainer.classList.add('active');
-      proxyFramesContainer.style.pointerEvents = 'auto';
-      proxyFramesContainer.style.zIndex = '100';
+    if (framesEl) {
+      framesEl.classList.add('active');
+      framesEl.style.pointerEvents = 'auto';
+      framesEl.style.zIndex = '100';
     }
 
-    document.querySelectorAll('.proxy-frame').forEach(frame => {
-      const isActive = frame.id === `proxy-frame-${tabId}`;
+    document.querySelectorAll('.frame').forEach(frame => {
+      const isActive = frame.id === `frame-${tabId}`;
       frame.style.display = isActive ? 'block' : 'none';
 
       if (isActive) {
@@ -177,11 +177,11 @@ function setActiveTab(tabId) {
       }
     });
 
-    if (browserContent) {
-      browserContent.classList.add('frame-active');
+    if (view) {
+      view.classList.add('frame-active');
     }
 
-    addressBarInput.value = tabs[tabId]?.url || '';
+    urlInput.value = tabs[tabId]?.url || '';
   }
 
   window.saveTabsToStorage(true);

@@ -71,7 +71,7 @@ function handleTabMouseMove(e) {
   let newIndex = dragState.currentIndex;
 
   const tabsContainer = document.querySelector('.tabs');
-  const newTabButton = document.querySelector('.new-tab-btn');
+  const newTabButton = document.querySelector('.add-tab');
   const newTabButtonRect = newTabButton ? newTabButton.getBoundingClientRect() : null;
   const newTabButtonLeft = newTabButtonRect ? newTabButtonRect.left : Infinity;
 
@@ -171,7 +171,7 @@ function handleTabMouseUp(e) {
 
   if (wasDragging) {
     const tabsContainer = document.querySelector('.tabs');
-    const newTabButton = document.querySelector('.new-tab-btn');
+    const newTabButton = document.querySelector('.add-tab');
     const isActive = draggedTab.classList.contains('active');
 
     draggedTab.classList.remove('dragging');

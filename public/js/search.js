@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const mainSearchInput = document.querySelector('.main-search-input');
-  const addressBarInput = document.querySelector('.address-bar-input');
+  const searchInput = document.querySelector('.search-input');
+  const urlInput = document.querySelector('.url-input');
 
   function processSearch(searchTerm) {
     if (!searchTerm) return;
@@ -33,36 +33,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }));
   }
 
-  mainSearchInput.addEventListener('keydown', e => {
+  searchInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const searchTerm = mainSearchInput.value.trim();
-      if (addressBarInput) {
-        addressBarInput.value = searchTerm;
+      const searchTerm = searchInput.value.trim();
+      if (urlInput) {
+        urlInput.value = searchTerm;
       }
       processSearch(searchTerm);
     }
   });
 
-  addressBarInput.addEventListener('keydown', e => {
+  urlInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const searchTerm = addressBarInput.value.trim();
+      const searchTerm = urlInput.value.trim();
       processSearch(searchTerm);
     }
   });
 
-  mainSearchInput.addEventListener('focus', () => {
-    mainSearchInput.classList.add('focused');
+  searchInput.addEventListener('focus', () => {
+    searchInput.classList.add('focused');
   });
 
-  mainSearchInput.addEventListener('blur', () => {
-    mainSearchInput.classList.remove('focused');
+  searchInput.addEventListener('blur', () => {
+    searchInput.classList.remove('focused');
   });
 
   window.addEventListener('glint:settings-updated', () => {});
 
-  document.querySelectorAll('.shortcut[data-url]').forEach((el) => {
+  document.querySelectorAll('.qlink[data-url]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
       const url = el.getAttribute('data-url');

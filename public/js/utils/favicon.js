@@ -44,7 +44,7 @@ function setTabFavicon(tabId, faviconUrl) {
   const tab = document.querySelector(`.tab[data-tab-id="${tabId}"]`);
   if (!tab) return;
 
-  const placeholder = tab.querySelector('.tab-favicon-placeholder');
+  const placeholder = tab.querySelector('.tab-fav');
   if (placeholder) placeholder.remove();
 
   let favicon = tab.querySelector('.tab-favicon');

@@ -153,7 +153,7 @@ function updateAddressBar(url, tabId) {
   addressBarUpdateTimeout = setTimeout(() => {
     try {
       const tabsRef = window.tabs || {};
-      const addressBarInput = document.querySelector('.address-bar-input');
+      const urlInput = document.querySelector('.url-input');
       
       if (!url.startsWith(location.origin + '/scramjet/')) {
         return;
@@ -175,8 +175,8 @@ function updateAddressBar(url, tabId) {
         window.saveTabsToStorage?.();
       }
 
-      if (addressBarInput && window.activeTabId === tabId) {
-        addressBarInput.value = displayUrl;
+      if (urlInput && window.activeTabId === tabId) {
+        urlInput.value = displayUrl;
       }
     } catch (e) {
       console.error('address bar update error:', e);
