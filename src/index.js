@@ -76,10 +76,17 @@ fastify.register(fastifyStatic, {
 	immutable: NODE_ENV !== 'development',
 	etag: true,
 	lastModified: true,
-	preCompressed: true
+	preCompressed: true,
+	setHeaders: (res, path) => {
+		res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+		if (path.endsWith(".css")) {
+			res.setHeader("Content-Type", "text/css; charset=utf-8");
+		}
+	}
 });
 
 fastify.get("/", (req, reply) => {
+	reply.header("Cross-Origin-Resource-Policy", "same-origin");
 	return reply.sendFile("index.html", publicDir);
 });
 
