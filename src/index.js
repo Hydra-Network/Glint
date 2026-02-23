@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { readFileSync } from "node:fs";
 import { hostname } from "node:os";
 import wisp from "wisp-server-node";
 import Fastify from "fastify";
@@ -13,6 +14,22 @@ import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '..', 'public');
+
+let indexHtmlWithInlineCss = null;
+function getIndexWithInlineCss() {
+	if (indexHtmlWithInlineCss) return indexHtmlWithInlineCss;
+	try {
+		const css = readFileSync(path.join(publicDir, 'css', 'styles.css'), 'utf8');
+		let html = readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+		html = html.replace(/<link rel="preload" href="\/css\/styles.css" as="style">\s*\n?/g, '');
+		html = html.replace(/<link rel="stylesheet" href="\/css\/styles.css">/, '<style>' + css + '</style>');
+		indexHtmlWithInlineCss = html;
+	} catch (e) {
+		console.error('Failed to inline CSS:', e.message);
+		indexHtmlWithInlineCss = readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+	}
+	return indexHtmlWithInlineCss;
+}
 
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -92,7 +109,7 @@ fastify.register(fastifyStatic, {
 });
 
 fastify.get("/", (req, reply) => {
-	return reply.sendFile("index.html", publicDir);
+	return reply.type("text/html; charset=utf-8").send(getIndexWithInlineCss());
 });
 
 const faviconCache = new Map();
