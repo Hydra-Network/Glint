@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const searchInput = document.querySelector('.search-input');
-  const urlInput = document.querySelector('.url-input');
+  const searchInput = document.querySelector('.search-input') || document.querySelector('.main-search-input');
+  const urlInput = document.querySelector('.url-input') || document.querySelector('.address-bar-input');
 
   function processSearch(searchTerm) {
     if (!searchTerm) return;
@@ -33,36 +33,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }));
   }
 
-  searchInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const searchTerm = searchInput.value.trim();
-      if (urlInput) {
-        urlInput.value = searchTerm;
+  if (searchInput) {
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const searchTerm = searchInput.value.trim();
+        if (urlInput) urlInput.value = searchTerm;
+        processSearch(searchTerm);
       }
-      processSearch(searchTerm);
-    }
-  });
+    });
+  }
 
-  urlInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const searchTerm = urlInput.value.trim();
-      processSearch(searchTerm);
-    }
-  });
+  if (urlInput) {
+    urlInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const searchTerm = urlInput.value.trim();
+        processSearch(searchTerm);
+      }
+    });
+  }
 
-  searchInput.addEventListener('focus', () => {
-    searchInput.classList.add('focused');
-  });
-
-  searchInput.addEventListener('blur', () => {
-    searchInput.classList.remove('focused');
-  });
+  if (searchInput) {
+    searchInput.addEventListener('focus', () => searchInput.classList.add('focused'));
+    searchInput.addEventListener('blur', () => searchInput.classList.remove('focused'));
+  }
 
   window.addEventListener('glint:settings-updated', () => {});
 
-  document.querySelectorAll('.qlink[data-url]').forEach((el) => {
+  document.querySelectorAll('.qlink[data-url], .shortcut[data-url]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
       const url = el.getAttribute('data-url');

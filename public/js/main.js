@@ -24,11 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.scramjet = scramjet;
 
   const tabsContainer = document.querySelector(".tabs");
-  const addTabBtn = document.querySelector(".add-tab");
-  const urlInput = document.querySelector(".url-input");
-  const searchInput = document.querySelector(".search-input");
-  const view = document.querySelector(".view");
-  const startPage = document.querySelector('.start-page');
+  const addTabBtn = document.querySelector(".add-tab") || document.querySelector(".new-tab-btn");
+  const urlInput = document.querySelector(".url-input") || document.querySelector(".address-bar-input");
+  const searchInput = document.querySelector(".search-input") || document.querySelector(".main-search-input");
+  const view = document.querySelector(".view") || document.querySelector(".browser-content");
+  const startPage = document.querySelector('.start-page') || document.querySelector('.new-tab-page');
 
   const tabs = {};
   let activeTabId = 'newtab';
@@ -48,11 +48,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   window.initTabHistory('newtab');
 
-  let framesEl = document.getElementById('frames');
+  let framesEl = document.getElementById('frames') || document.getElementById('proxy-frames-container');
   if (!framesEl) {
     framesEl = document.createElement('div');
     framesEl.id = 'frames';
-    view.appendChild(framesEl);
+    if (view) view.appendChild(framesEl);
+    else document.body.appendChild(framesEl);
   }
 
   framesEl.style.width = '100%';
@@ -121,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 proxyFrame.classList.add('loading');
 
                 if (tabId === activeTabId) {
-                  startPage.style.display = 'none';
+                  if (startPage) startPage.style.display = 'none';
 
                   if (framesEl) {
                     framesEl.classList.add('active');
