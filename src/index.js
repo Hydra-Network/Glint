@@ -21,6 +21,7 @@ function getIndexWithInlineCss() {
 	try {
 		const css = readFileSync(path.join(publicDir, 'css', 'loading.css'), 'utf8');
 		let html = readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+		html = html.replace(/<link rel="preload" href="[^"]*loading\.css" as="style">\s*\n?/g, '');
 		html = html.replace(/<link rel="stylesheet" href="[^"]*loading\.css"[^>]*\/?>/, '<style>' + css + '</style>');
 		indexHtmlWithInlineCss = html;
 	} catch (e) {
@@ -95,13 +96,6 @@ fastify.get("/css/loading.css", (req, reply) => {
 	return reply.type("text/css; charset=utf-8").sendFile("css/loading.css", publicDir);
 });
 
-fastify.get("/", (req, reply) => {
-	return reply.type("text/html; charset=utf-8").send(getIndexWithInlineCss());
-});
-fastify.get("/index.html", (req, reply) => {
-	return reply.type("text/html; charset=utf-8").send(getIndexWithInlineCss());
-});
-
 fastify.register(fastifyStatic, {
 	root: publicDir,
 	prefix: "/",
@@ -112,6 +106,10 @@ fastify.register(fastifyStatic, {
 	etag: true,
 	lastModified: true,
 	preCompressed: true
+});
+
+fastify.get("/", (req, reply) => {
+	return reply.type("text/html; charset=utf-8").send(getIndexWithInlineCss());
 });
 
 const faviconCache = new Map();

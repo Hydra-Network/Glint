@@ -17,11 +17,12 @@
   <meta name="twitter:image" content="https://glintapp.org/images/page.png">
   <title>Glint Browser</title>
 
+  <link rel="preload" href="/js/main.js" as="script">
   <link rel="dns-prefetch" href="https://fonts.googleapis.com">
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 
-  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -90,25 +91,25 @@
     });
   </script>
 
-  <script src="/baremux/index.js" defer></script>
-  <script src="/epoxy/index.js" defer></script>
+  <script src="baremux/index.js" defer></script>
+  <script src="epoxy/index.js" defer></script>
 
-  <script src="/js/utils/url-utils.js" defer></script>
-  <script src="/js/utils/favicon.js" defer></script>
-  <script src="/js/utils/proxy-frames.js" defer></script>
+  <script src="js/utils/url-utils.js" defer></script>
+  <script src="js/utils/favicon.js" defer></script>
+  <script src="js/utils/proxy-frames.js" defer></script>
 
-  <script src="/js/tabs/tab-history.js" defer></script>
-  <script src="/js/tabs/tab-storage.js" defer></script>
-  <script src="/js/tabs/tab-dragging.js" defer></script>
-  <script src="/js/tabs/tab-management.js" defer></script>
+  <script src="js/tabs/tab-history.js" defer></script>
+  <script src="js/tabs/tab-storage.js" defer></script>
+  <script src="js/tabs/tab-dragging.js" defer></script>
+  <script src="js/tabs/tab-management.js" defer></script>
 
-  <script src="/js/navigation/navigation.js" defer></script>
-  <script src="/js/search.js" defer></script>
-  <script src="/js/proxy-config.js" defer></script>
-  <script src="/js/options.js" defer></script>
+  <script src="js/navigation/navigation.js" defer></script>
+  <script src="js/search.js" defer></script>
+  <script src="js/proxy-config.js" defer></script>
+  <script src="js/options.js" defer></script>
   <script src="/js/main.js" defer></script>
 
-  <script src="/js/register-sw.js" defer></script>
+  <script src="js/register-sw.js" defer></script>
 </head>
 
 <body>
@@ -117,7 +118,7 @@
       <div class="tabs">
         <div class="tab active" data-tab-id="newtab">
           <div class="tab-fav">
-            <img src="/images/logo.png" alt="Glint Logo" class="tab-logo">
+            <img src="images/logo.png" alt="Glint Logo" class="tab-logo">
           </div>
           <span class="tab-title">New Tab</span>
           <span class="tab-close"><i class="fas fa-times"></i></span>
@@ -154,7 +155,7 @@
         <div class="start-inner">
           <div class="welcome">
             <div class="logo-wrap">
-              <img src="/images/logo.png" alt="Glint Logo" class="main-logo">
+              <img src="images/logo.png" alt="Glint Logo" class="main-logo">
             </div>
 
             <div class="search-wrap">
@@ -168,19 +169,19 @@
 
             <div class="quick-links">
               <a href="#" class="qlink qlink-yt" data-url="https://www.youtube.com" title="YouTube">
-                <span class="qlink-icon"><img src="/images/youtube.png" alt="" width="32" height="32"></span>
+                <span class="qlink-icon"><img src="images/youtube.png" alt="" width="32" height="32"></span>
                 <span class="qlink-label">YouTube</span>
               </a>
               <a href="#" class="qlink qlink-reddit" data-url="https://www.reddit.com" title="Reddit">
-                <span class="qlink-icon"><img src="/images/reddit.png" alt="" width="32" height="32"></span>
+                <span class="qlink-icon"><img src="images/reddit.png" alt="" width="32" height="32"></span>
                 <span class="qlink-label">Reddit</span>
               </a>
               <a href="#" class="qlink qlink-discord" data-url="https://discord.com" title="Discord">
-                <span class="qlink-icon"><img src="/images/discord.png" alt="" width="32" height="32"></span>
+                <span class="qlink-icon"><img src="images/discord.png" alt="" width="32" height="32"></span>
                 <span class="qlink-label">Discord</span>
               </a>
               <a href="#" class="qlink qlink-x" data-url="https://x.com" title="X">
-                <span class="qlink-icon"><img src="/images/X.png" alt="" width="32" height="32"></span>
+                <span class="qlink-icon"><img src="images/X.png" alt="" width="32" height="32"></span>
                 <span class="qlink-label">X</span>
               </a>
               <a href="#" class="qlink qlink-games" data-url="/games.html" title="Games">

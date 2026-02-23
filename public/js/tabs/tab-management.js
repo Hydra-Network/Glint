@@ -5,7 +5,7 @@ function createTabElement(tabId, tabData) {
 
   const faviconHtml = tabData.favicon
     ? `<img src="${tabData.favicon}" alt="Favicon" class="tab-favicon">`
-    : `<div class="tab-fav"><img src="/images/logo.png" alt="Glint Logo" class="tab-logo"></div>`;
+    : `<div class="tab-fav"><img src="images/logo.png" alt="Glint Logo" class="tab-logo"></div>`;
 
   newTabElement.innerHTML = `
     ${faviconHtml}
