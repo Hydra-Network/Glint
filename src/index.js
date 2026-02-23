@@ -24,8 +24,16 @@ const fastify = Fastify({
 	serverFactory: (handler) => {
 		return createServer()
 			.on("request", (req, res) => {
-				res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-				res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+				const pathname = (req.url || "").split("?")[0];
+				const isDocOrStatic = pathname === "/" || pathname === "/index.html" ||
+					pathname.startsWith("/css/") || pathname.startsWith("/js/") ||
+					pathname.startsWith("/images/") || pathname.startsWith("/baremux/") ||
+					pathname.startsWith("/epoxy/") ||
+					/\.(css|js|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|webp)$/i.test(pathname);
+				if (!isDocOrStatic) {
+					res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+					res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+				}
 				res.setHeader("Connection", "keep-alive");
 				res.setHeader("Keep-Alive", "timeout=30, max=1000");
 				handler(req, res);
@@ -67,6 +75,10 @@ fastify.register(fastifyCompress, {
 	customTypes: /^(?!image\/|video\/|audio\/|application\/octet-stream)/
 });
 
+fastify.get("/css/styles.css", (req, reply) => {
+	return reply.type("text/css; charset=utf-8").sendFile("css/styles.css", publicDir);
+});
+
 fastify.register(fastifyStatic, {
 	root: publicDir,
 	prefix: "/",
@@ -76,17 +88,10 @@ fastify.register(fastifyStatic, {
 	immutable: NODE_ENV !== 'development',
 	etag: true,
 	lastModified: true,
-	preCompressed: true,
-	setHeaders: (res, path) => {
-		res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
-		if (path.endsWith(".css")) {
-			res.setHeader("Content-Type", "text/css; charset=utf-8");
-		}
-	}
+	preCompressed: true
 });
 
 fastify.get("/", (req, reply) => {
-	reply.header("Cross-Origin-Resource-Policy", "same-origin");
 	return reply.sendFile("index.html", publicDir);
 });
 
